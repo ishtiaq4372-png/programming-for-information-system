@@ -1,0 +1,98 @@
+Here is the complete code for a `custom.html` file that demonstrates creating a custom element, attaching a Shadow DOM, and selecting an element inside it.
+
+This file can be opened directly in a modern browser.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Component Example</title>
+    <style>
+        /* Styles for the main page (Light DOM) */
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Custom Element Demonstration</h1>
+
+    <my-web-component></my-web-component>
+
+    <p>The text above "Hello from the Shadow DOM!" is inside the custom element's Shadow DOM and its styles are isolated from this page.</p>
+
+    <script>
+        // 1. Creating a class extending HTMLElement
+        class MyWebComponent extends HTMLElement {
+            constructor() {
+                super(); // Always call super() first in the constructor
+
+                // 2. Attaching a Shadow DOM
+                const shadowRoot = this.attachShadow({ mode: 'open' }); 
+
+                // Define the content and internal styles for the Shadow DOM
+                shadowRoot.innerHTML = `
+                    <style>
+                        /* Styles here are SCOPED ONLY to this component */
+                        #container {
+                            border: 2px solid #007bff;
+                            padding: 15px;
+                            border-radius: 8px;
+                            background-color: #e9f7ff;
+                        }
+                        p {
+                            color: darkgreen; /* This color won't affect the <p> tag outside */
+                            font-size: 1.1em;
+                            margin: 5px 0;
+                        }
+                        #message {
+                            font-weight: bold;
+                            text-decoration: underline;
+                        }
+                    </style>
+                    <div id="container">
+                        <p id="message">Hello from the Shadow DOM!</p>
+                        <button>Inspect Console</button>
+                    </div>
+                `;
+
+                // 3. Selecting elements inside the shadow root using shadowRoot.querySelector
+                const messageElement = shadowRoot.querySelector('#message');
+                const buttonElement = shadowRoot.querySelector('button');
+
+                // Example of using the selected elements
+                if (messageElement) {
+                    console.log('✅ Found message element inside shadowRoot:', messageElement.textContent);
+                    
+                    // You can manipulate the element found inside the Shadow DOM
+                    messageElement.style.color = 'red';
+                }
+
+                if (buttonElement) {
+                    buttonElement.addEventListener('click', () => {
+                        alert('Button clicked inside the component! Check the console.');
+                        console.log('Button Clicked! Attempting to find the message element again...');
+                        // Note: Using the cached variable `messageElement` is faster
+                        if (messageElement) {
+                            console.log('Current message text:', messageElement.textContent);
+                        }
+                    });
+                }
+            }
+        }
+
+        // Register the custom element with the DOM
+        // The name *must* contain a hyphen (-)
+        customElements.define('my-web-component', MyWebComponent);
+    </script>
+
+</body>
+</html>
+```
